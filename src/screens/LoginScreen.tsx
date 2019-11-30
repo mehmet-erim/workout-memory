@@ -1,10 +1,13 @@
 import * as Facebook from 'expo-facebook';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import colors from '../../styles/colors';
-import { firebase } from '../../utilities/firebase';
+import colors from '../styles/colors';
+import { firebaseInstance } from '../utilities/firebase';
+import Spinner from '../components/Spinner';
 
 export default function({ navigation }) {
+  const [loading, setLoading] = useState(false);
+
   const loginWithFacebook = async () => {
     let type, token;
     try {
@@ -18,22 +21,28 @@ export default function({ navigation }) {
     }
 
     if (type === 'success') {
-      const credential = firebase.auth.FacebookAuthProvider.credential(token);
-      firebase
+      setLoading(true);
+      const credential = firebaseInstance.auth.FacebookAuthProvider.credential(token);
+      firebaseInstance
         .auth()
         .signInWithCredential(credential)
         .catch(error => {
           Alert.alert('An error occurred', error);
         })
-        .then(() => navigation.navigate('Home'));
+        .then(() => navigation.navigate('Home'))
+        .finally(() => setLoading(false));
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={loginWithFacebook}>
-        <Text style={{ color: colors.white }}>Login with Facebook</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={loginWithFacebook}>
+          <Text style={{ color: colors.white }}>Login with Facebook</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
