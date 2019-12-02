@@ -5,11 +5,12 @@ import { createStackNavigator } from 'react-navigation-stack';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import AuthLoadingScreen from './src/screens/AuthLoadingScreen';
-import AddEditTrainingScreen from './src/screens/AddEditTrainingScreen';
+import TrainingScreen from './src/screens/TrainingScreen';
+import MovementsScreen from './src/screens/MovementsScreen';
 
 const AppStack = createStackNavigator(
-  { Home: HomeScreen, AddEditTraining: AddEditTrainingScreen },
-  { initialRouteName: 'AddEditTraining' },
+  { Home: HomeScreen, Training: TrainingScreen, Movements: MovementsScreen },
+  { initialRouteName: 'Home' },
 );
 const AuthStack = createStackNavigator({
   Login: { screen: LoginScreen, navigationOptions: { headerStyle: { display: 'none' } } },

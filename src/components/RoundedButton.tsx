@@ -1,21 +1,32 @@
 import React from 'react';
 import colors from '../styles/colors';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function({ bgColor = colors.green, onPress }) {
+export default function({
+  bgColor = colors.green,
+  onPress,
+  size = 30,
+  iconName = 'plus',
+  style = {},
+}) {
   return (
-    <TouchableOpacity style={{ ...styles.button, backgroundColor: bgColor }} onPress={onPress}>
-      <AntDesign style={{ color: '#fff', margin: '18%' }} name="plus" size={30} />
+    <TouchableOpacity
+      style={{ ...styles.button, ...style, backgroundColor: bgColor, maxHeight: size, width: size }}
+      onPress={onPress}
+    >
+      <AntDesign style={{ color: '#fff' }} name={iconName} size={size - 15} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    height: 50,
-    width: 50,
     borderRadius: 100,
     color: colors.white,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });
