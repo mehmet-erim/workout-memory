@@ -29,8 +29,10 @@ export default function({ navigation }) {
         .catch(error => {
           Alert.alert('An error occurred', error);
         })
-        .then(() => navigation.navigate('Home'))
-        .finally(() => setLoading(false));
+        .then(() => {
+          setLoading(false);
+          navigation.navigate('Home');
+        });
     }
   };
 
