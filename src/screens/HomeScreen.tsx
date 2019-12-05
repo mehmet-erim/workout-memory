@@ -1,36 +1,35 @@
-import React, { useState, useEffect } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  StyleSheet
-} from "react-native";
-import { database, firebaseInstance } from "../utilities/firebase";
-import RoundedButton from "../components/RoundedButton";
-import colors from "../styles/colors";
-import compare from "just-compare";
-import snq from "snq";
+import React, { useState, useEffect } from 'react';
+import { Text, TouchableOpacity, View, FlatList, StyleSheet } from 'react-native';
+import { database, firebaseInstance } from '../utilities/firebase';
+import RoundedButton from '../components/RoundedButton';
+import colors from '../styles/colors';
+import compare from 'just-compare';
+import snq from 'snq';
+import workoutStore from '../stores/workout-store';
 
 let initialized = false;
 export default function({ navigation }) {
+  if (!workoutStore.workouts && !workoutStore.workoutList.length) {
+    workoutStore.get();
+  }
+
   const [workouts, setWorkouts] = useState({});
 
   const logout = () => {
     firebaseInstance.auth().signOut();
-    navigation.navigate("Login");
+    navigation.navigate('Login');
   };
 
   let obj = {};
 
   const refresh = () => {
-    const ref = database.ref("/workouts");
-    ref.once("value").then(function(snapshot) {
+    const ref = database.ref('/workouts');
+    ref.once('value').then(function(snapshot) {
       if (compare(obj, snapshot.val())) return;
       setWorkouts(snapshot.val());
       obj = { ...snapshot.val() };
       initialized = true;
-      ref.off("value");
+      ref.off('value');
     });
   };
 
@@ -42,12 +41,12 @@ export default function({ navigation }) {
 
   const renderListItem = item => {
     return (
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate("Training", {
+            navigation.navigate('Workout', {
               workoutIndex: item.key,
-              test: "test"
+              test: 'test',
             })
           }
         >
@@ -69,13 +68,13 @@ export default function({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, alignContent: "center" }}>
+    <View style={{ flex: 1, alignContent: 'center' }}>
       <Text
         style={{
           fontSize: 20,
-          textAlign: "center",
+          textAlign: 'center',
           color: colors.black,
-          fontWeight: "700"
+          fontWeight: '700',
         }}
       >
         Workouts
@@ -91,13 +90,13 @@ export default function({ navigation }) {
         <Text>Logout</Text>
       </TouchableOpacity> */}
 
-      <TouchableOpacity onPress={() => navigation.navigate("Movements")}>
+      <TouchableOpacity onPress={() => navigation.navigate('Movements')}>
         <Text>Movements</Text>
       </TouchableOpacity>
 
       <RoundedButton
-        style={{ position: "absolute", bottom: "10%", right: "10%" }}
-        onPress={() => navigation.navigate("Training", { test: "test" })}
+        style={{ position: 'absolute', bottom: '10%', right: '10%' }}
+        onPress={() => navigation.navigate('Workout', { test: 'test' })}
         size={40}
       />
 
@@ -115,6 +114,6 @@ const styles = StyleSheet.create({
   item: {
     padding: 10,
     fontSize: 18,
-    height: 44
-  }
+    height: 44,
+  },
 });
