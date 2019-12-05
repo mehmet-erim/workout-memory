@@ -2,6 +2,7 @@ import { observable, computed } from 'mobx';
 import { database, firebaseInstance } from '../utilities/firebase';
 import snq from 'snq';
 import authStore from './auth-store';
+import { getNextKey } from '../utilities/common';
 
 let index = 0;
 
@@ -37,18 +38,14 @@ class MovementsStore {
   }
 
   save(value: string, key?: string) {
-    if (this.movementList.length) {
-      if (!key) {
-        key = this.movementList[this.movementList.length - 1].key;
-      }
-
-      key = String(snq(() => Number(key.replace(/movement/i, '')) + 1, 0));
-    } else {
+    if (this.movements && !key) {
+      key = getNextKey(this.movements, 'movement');
+    } else if (!key) {
       key = '0';
     }
 
     return database
-      .ref(`users/${authStore.currentUserUid}/movements/movement${key}`)
+      .ref(`users/${authStore.currentUserUid}/movements/${key}`)
       .set(value)
       .then(() => this.get());
   }

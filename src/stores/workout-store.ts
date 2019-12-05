@@ -2,6 +2,7 @@ import { observable, computed } from 'mobx';
 import { database, firebaseInstance } from '../utilities/firebase';
 import snq from 'snq';
 import authStore from './auth-store';
+import { getNextKey } from '../utilities/common';
 
 let index = 0;
 
@@ -47,13 +48,9 @@ class WorkoutsStore {
   }
 
   save(value: any, key?: string) {
-    if (this.workoutList.length) {
-      if (!key) {
-        key = this.workoutList[this.workoutList.length - 1].key;
-      }
-
-      key = String(snq(() => Number(key.replace(/workout/i, '')) + 1, 0));
-    } else {
+    if (this.workouts && !key) {
+      key = getNextKey(this.workouts, 'workout');
+    } else if (!key) {
       key = '0';
     }
 
