@@ -1,30 +1,30 @@
-import { observable, computed } from "mobx";
-import { database, firebaseInstance } from "../utilities/firebase";
-import snq from "snq";
-import authStore from "./auth-store";
+import { observable, computed } from 'mobx';
+import { database, firebaseInstance } from '../utilities/firebase';
+import snq from 'snq';
+import authStore from './auth-store';
 
 let index = 0;
 
 class MovementsStore {
-  @observable movements = {};
+  @observable movements;
   @computed get movementList() {
     if (!this.movements || !Object.keys(this.movements).length) {
       return [];
     }
 
-    // console.log(Object.keys(this.movements));
-    return Object.keys(this.movements).map(key => ({
-      key,
-      val: this.movements[key]
-    }));
+    return Object.keys(this.movements)
+      .map(key => ({
+        key,
+        val: this.movements[key],
+      }))
+      .sort((a, b) => +a.key.replace(/movement/i, '') - +b.key.replace(/movement/i, ''));
   }
 
   get() {
     return database
       .ref(`users/${authStore.currentUserUid}/movements`)
-      .once("value")
+      .once('value')
       .then(snapshot => {
-        console.log("hey", snapshot.val());
         this.movements = snapshot.val() || {};
       });
   }
@@ -42,9 +42,9 @@ class MovementsStore {
         key = this.movementList[this.movementList.length - 1].key;
       }
 
-      key = String(snq(() => Number(key.replace(/movement/i, "")) + 1, 0));
+      key = String(snq(() => Number(key.replace(/movement/i, '')) + 1, 0));
     } else {
-      key = "0";
+      key = '0';
     }
 
     return database
