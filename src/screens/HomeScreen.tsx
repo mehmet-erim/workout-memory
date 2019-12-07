@@ -18,7 +18,7 @@ const HomeScreen = ({ navigation }) => {
       <Divider />
       <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <RoundedButton
-          style={{ position: 'absolute', bottom: '10%', right: '10%' }}
+          style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
           onPress={() => navigation.navigate('Workout', { test: 'test' })}
           size={40}
         />

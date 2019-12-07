@@ -1,16 +1,7 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import compare from 'just-compare';
 import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  DatePickerIOS,
-  Picker,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { DatePickerIOS, Picker, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from '../components/Modal';
 import RoundedButton from '../components/RoundedButton';
 import { database } from '../utilities/firebase';
@@ -20,6 +11,23 @@ import workoutStore from '../stores/workout-store';
 import Spinner from '../components/Spinner';
 import movementsStore from '../stores/movements-store';
 import { observer } from 'mobx-react';
+import {
+  Icon,
+  TopNavigation,
+  Divider,
+  Layout,
+  Text,
+  TopNavigationAction,
+  Button,
+  Datepicker,
+  Input,
+} from '@ui-kitten/components';
+import { SafeAreaView } from 'react-navigation';
+
+const BackIcon = style => <Icon {...style} name="arrow-back" />;
+const CheckIcon = style => <Icon {...style} name="checkmark-outline" />;
+const CalendarIcon = style => <Icon {...style} name="calendar" />;
+const TitleIcon = style => <Icon {...style} name="file-text-outline" />;
 
 const WorkoutScreen = ({ navigation }) => {
   const [isOpenDatepicker, setIsOpenDatepicker] = useState(false);
@@ -93,137 +101,142 @@ const WorkoutScreen = ({ navigation }) => {
     });
   };
 
-  return movementsStore.movementList.length && (!workoutIndex || title) ? (
-    <View style={styles.container}>
-      <RoundedButton
-        style={{ position: 'absolute', right: 20, bottom: 20 }}
-        onPress={() => setModalVisible(true)}
-        size={50}
-      />
-      <View style={styles.workoutContainer}>
-        <View style={{ margin: 10 }}>
-          <TextInput
-            style={{ fontSize: 20 }}
-            placeholder="Title"
-            value={title}
-            onChangeText={text => setTitle(text)}
-          />
-        </View>
-        <TouchableOpacity onPress={() => setIsOpenDatepicker(!isOpenDatepicker)}>
-          <Text>
-            {isOpenDatepicker ? (
-              <FontAwesome name="times" size={30} />
-            ) : (
-              <MaterialIcons name="date-range" size={30} />
-            )}
-            {date.toString()}
-          </Text>
-        </TouchableOpacity>
-        {isOpenDatepicker ? (
-          <DatePickerIOS date={date} onDateChange={isoString => setDate(new Date(isoString))} />
-        ) : null}
+  const navigateBack = () => {
+    navigation.goBack();
+  };
 
-        <View style={{ marginTop: 15 }}>
-          <Table borderStyle={{ borderWidth: 2, borderColor: '#c8e1ff' }}>
-            <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-            <Rows data={tableData} textStyle={styles.text} />
-          </Table>
-        </View>
-        <Button title="Save" onPress={save}></Button>
-      </View>
+  const BackAction = () => <TopNavigationAction icon={BackIcon} onPress={navigateBack} />;
+  const RightActions = () => <TopNavigationAction icon={CheckIcon} onPress={save} />;
 
-      <Modal modalVisible={modalVisible} onChangeModalVisible={val => setModalVisible(val)}>
-        <View>
-          <TouchableOpacity onPress={() => setIsOpenMovementList(!isOpenMovementList)}>
-            <Text>
-              {isOpenMovementList ? (
-                <FontAwesome name="times" size={30} />
-              ) : (
-                <MaterialIcons name="fitness-center" size={30} />
-              )}
-              {movementsStore.movements[movement]}
-            </Text>
-          </TouchableOpacity>
-          {isOpenMovementList ? (
-            <Picker
-              selectedValue={movement}
-              onValueChange={(itemValue, itemIndex) => setMovement(itemValue)}
-            >
-              <Picker.Item label="" value={null} />
-              {movementsStore.movementList.map(data => (
-                <Picker.Item key={data.key} label={data.val} value={data.key} />
-              ))}
-            </Picker>
-          ) : null}
+  console.log('rendered');
 
-          <View style={{ marginTop: 10 }}>
-            <Text>Set:</Text>
-            <TextInput
-              keyboardType="numeric"
-              placeholder="Set"
-              value={String(setCount)}
-              onChangeText={text => setSetCount(+text)}
-            />
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <TopNavigation alignment="center" leftControl={BackAction()} rightControls={RightActions()} />
+      <Divider />
+      <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <RoundedButton
+          style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
+          onPress={() => setModalVisible(true)}
+          size={40}
+        />
+        {movementsStore.movementList.length && (!workoutIndex || title) ? (
+          <View style={styles.container}>
+            <View style={styles.workoutContainer}>
+              <View>
+                <Input
+                  placeholder="Title"
+                  value={title}
+                  onChangeText={text => setTitle(text)}
+                  icon={TitleIcon}
+                />
+                <Datepicker
+                  style={{ marginTop: 10 }}
+                  placeholder="Pick Date"
+                  date={date}
+                  onSelect={setDate}
+                  icon={CalendarIcon}
+                />
+              </View>
+
+              <View style={{ marginTop: 15 }}>
+                <Table borderStyle={{ borderWidth: 2, borderColor: '#c8e1ff' }}>
+                  <Row data={tableHead} style={styles.head} textStyle={styles.text} />
+                  <Rows data={tableData} textStyle={styles.text} />
+                </Table>
+              </View>
+            </View>
+
+            <Modal modalVisible={modalVisible} onChangeModalVisible={val => setModalVisible(val)}>
+              <View>
+                <TouchableOpacity onPress={() => setIsOpenMovementList(!isOpenMovementList)}>
+                  <Text>
+                    {isOpenMovementList ? (
+                      <FontAwesome name="times" size={30} />
+                    ) : (
+                      <MaterialIcons name="fitness-center" size={30} />
+                    )}
+                    {movementsStore.movements[movement]}
+                  </Text>
+                </TouchableOpacity>
+                {isOpenMovementList ? (
+                  <Picker
+                    selectedValue={movement}
+                    onValueChange={(itemValue, itemIndex) => setMovement(itemValue)}
+                  >
+                    <Picker.Item label="" value={null} />
+                    {movementsStore.movementList.map(data => (
+                      <Picker.Item key={data.key} label={data.val} value={data.key} />
+                    ))}
+                  </Picker>
+                ) : null}
+
+                <View style={{ marginTop: 10 }}>
+                  <Text>Set:</Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Set"
+                    value={String(setCount)}
+                    onChangeText={text => setSetCount(+text)}
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Text>Rep:</Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Rep"
+                    value={String(repCount)}
+                    onChangeText={text => setRepCount(+text)}
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Text>Weight:</Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Weight"
+                    value={String(weight)}
+                    onChangeText={text => setWeight(+text)}
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Text>Notes:</Text>
+                  <TextInput
+                    numberOfLines={4}
+                    placeholder="Notes"
+                    value={notes}
+                    onChangeText={text => setNotes(text)}
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Text>Order:</Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    placeholder="Order"
+                    value={String(order)}
+                    onChangeText={text => setOrder(+text)}
+                  />
+                </View>
+                <Button onPress={addNewElement}>Save</Button>
+              </View>
+            </Modal>
           </View>
-          <View style={{ marginTop: 10 }}>
-            <Text>Rep:</Text>
-            <TextInput
-              keyboardType="numeric"
-              placeholder="Rep"
-              value={String(repCount)}
-              onChangeText={text => setRepCount(+text)}
-            />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Text>Weight:</Text>
-            <TextInput
-              keyboardType="numeric"
-              placeholder="Weight"
-              value={String(weight)}
-              onChangeText={text => setWeight(+text)}
-            />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Text>Notes:</Text>
-            <TextInput
-              numberOfLines={4}
-              placeholder="Notes"
-              value={notes}
-              onChangeText={text => setNotes(text)}
-            />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Text>Order:</Text>
-            <TextInput
-              keyboardType="numeric"
-              placeholder="Order"
-              value={String(order)}
-              onChangeText={text => setOrder(+text)}
-            />
-          </View>
-          <Button title="Save" onPress={addNewElement}></Button>
-        </View>
-      </Modal>
-    </View>
-  ) : (
-    <Spinner />
+        ) : (
+          <Spinner />
+        )}
+      </Layout>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    minWidth: '85%',
   },
   workoutContainer: {
     flex: 3,
     justifyContent: 'flex-start',
     marginTop: 10,
-  },
-  date: {
-    borderWidth: 2,
-    borderColor: '#333',
-    width: '30%',
-    height: 50,
   },
   head: { height: 40, backgroundColor: '#f1f8ff' },
   text: { margin: 6 },
