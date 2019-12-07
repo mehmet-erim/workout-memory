@@ -6,38 +6,18 @@ import colors from '../styles/colors';
 import compare from 'just-compare';
 import snq from 'snq';
 import workoutStore from '../stores/workout-store';
+import { observer } from 'mobx-react';
+import { FontAwesome } from '@expo/vector-icons';
 
-let initialized = false;
-export default function({ navigation }) {
+const HomeScreen = ({ navigation }) => {
   if (!workoutStore.workouts && !workoutStore.workoutList.length) {
     workoutStore.get();
   }
-
-  const [workouts, setWorkouts] = useState({});
 
   const logout = () => {
     firebaseInstance.auth().signOut();
     navigation.navigate('Login');
   };
-
-  let obj = {};
-
-  const refresh = () => {
-    const ref = database.ref('/workouts');
-    ref.once('value').then(function(snapshot) {
-      if (compare(obj, snapshot.val())) return;
-      setWorkouts(snapshot.val());
-      obj = { ...snapshot.val() };
-      initialized = true;
-      ref.off('value');
-    });
-  };
-
-  useEffect(() => {
-    if (!initialized) {
-      refresh();
-    }
-  });
 
   const renderListItem = item => {
     return (
@@ -51,10 +31,10 @@ export default function({ navigation }) {
           }
         >
           <Text style={styles.item}>{item.title}</Text>
-          <Text style={styles.item}>{item.date}</Text>
+          <Text>{new Date(item.date).toString()}</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => remove(item.key)}
+        <TouchableOpacity
+          onPress={() => workoutStore.remove(item.key)}
           style={{
             alignSelf: 'center',
             marginLeft: 15,
@@ -62,7 +42,7 @@ export default function({ navigation }) {
           }}
         >
           <FontAwesome style={{ color: 'red' }} name="times" />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     );
   };
@@ -79,36 +59,21 @@ export default function({ navigation }) {
       >
         Workouts
       </Text>
-      <TouchableOpacity
-        onPress={() => {
-          refresh();
-        }}
-      >
-        <Text>Refresh</Text>
-      </TouchableOpacity>
       {/* <TouchableOpacity onPress={logout}>
         <Text>Logout</Text>
       </TouchableOpacity> */}
-
       <TouchableOpacity onPress={() => navigation.navigate('Movements')}>
         <Text>Movements</Text>
       </TouchableOpacity>
-
       <RoundedButton
         style={{ position: 'absolute', bottom: '10%', right: '10%' }}
         onPress={() => navigation.navigate('Workout', { test: 'test' })}
         size={40}
       />
-
-      {workouts && Object.keys(workouts) ? (
-        <FlatList
-          data={Object.keys(workouts).map(key => ({ ...workouts[key], key }))}
-          renderItem={({ item }) => renderListItem(item)}
-        />
-      ) : null}
+      <FlatList data={workoutStore.workoutList} renderItem={({ item }) => renderListItem(item)} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   item: {
@@ -117,3 +82,5 @@ const styles = StyleSheet.create({
     height: 44,
   },
 });
+
+export default observer(HomeScreen);

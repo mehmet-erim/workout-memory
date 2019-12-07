@@ -17,7 +17,7 @@ class WorkoutsStore {
     return Object.keys(this.workouts)
       .map(key => ({
         key,
-        val: this.workouts[key],
+        ...this.workouts[key],
       }))
       .sort((a, b) => +a.key.replace(/workout/i, '') - +b.key.replace(/workout/i, ''));
   }
