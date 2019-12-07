@@ -850,6 +850,21 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@eva-design/dss@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@eva-design/dss/-/dss-1.3.0.tgz#f3e33192681d6ddc3dbddbe4040b248bc10e3612"
+  integrity sha512-g5VdOXycxRInC+aZif60q6IySLga78CuhYEdU7ry+oOUul6GXVhGcRe0q+4MVkZXBA90IDdqh/e8gN2SOqfIRQ==
+
+"@eva-design/eva@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@eva-design/eva/-/eva-1.3.0.tgz#9e20da2a5bd0f4420728f32d8ab93452c6fcc238"
+  integrity sha512-wdi+wolofBrEzGtSGv2mzLTndS61A+pQMrpqUhd0TH1cH3D5sjS8C81lzonwrv0qCRapNnb3X9mg8Bw0To/xNQ==
+
+"@eva-design/processor@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@eva-design/processor/-/processor-1.3.0.tgz#8fd0e7b946d3c3f5969fc8484bb609f3f8606eb4"
+  integrity sha512-wuVI00tjBfA6S4bKLLpxJFBVThFPyQUR+1uBN8OH7pEUUCfo/0u8UoW41SM2+BYdHbhaYCZzw6BXHXsHULZ2Ig==
+
 "@expo/vector-icons@^10.0.2":
   version "10.0.6"
   resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-10.0.6.tgz#5718953ff0b97827d11dae5787976fa8ce5caaed"
@@ -1265,6 +1280,24 @@
   version "0.0.27"
   resolved "https://registry.yarnpkg.com/@types/websql/-/websql-0.0.27.tgz#621a666a7f02018e7cbb4abab956a25736c27d71"
   integrity sha1-Yhpman8CAY58u0q6uVaiVzbCfXE=
+
+"@ui-kitten/components@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@ui-kitten/components/-/components-4.3.1.tgz#2b7a90d77b36e4c764f8ebd1b1319f16fcfbb42a"
+  integrity sha512-/7rKWQDJaE3skSvlKreH9AFtzUOaaB3XPwaTds5Wd/KE2he1dUxtqD1vimu4q/MHS90mNG9A7NEbAYlCdjkEfQ==
+  dependencies:
+    "@eva-design/dss" "^1.3.0"
+    "@eva-design/processor" "^1.3.0"
+    fecha "3.0.3"
+    hoist-non-react-statics "^3.2.1"
+    lodash.merge "^4.6.1"
+
+"@ui-kitten/eva-icons@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@ui-kitten/eva-icons/-/eva-icons-4.3.1.tgz#aa3eff84e5601b90244b4552a9877b30cbbbcbe2"
+  integrity sha512-DazQkZmBqnlhOfkWzkORM+phImHHgKjCZ1XGNykQRvl0GbUjyhTzQ4nLgCta1sKqYOSBxhEmxEOvyDI+NHDlcA==
+  dependencies:
+    react-native-eva-icons "1.1.0"
 
 "@unimodules/core@~4.0.0":
   version "4.0.0"
@@ -2562,6 +2595,11 @@ fbjs@^1.0.0:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
+fecha@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/fecha/-/fecha-3.0.3.tgz#fabbd416497649a42c24d34bfa726b579203a1e2"
+  integrity sha512-6LQK/1jud/FZnfEEZJ7y81vw7ge81DNd/XEsX0hgMUjhS+QMljkb1C0czBaP7dMNRVrd5mw/J2J7qI2Nw+TWZw==
+
 figures@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/figures/-/figures-2.0.0.tgz#3ab1a2d2a62c8bfb431a0c94cb797a2fce27c962"
@@ -2898,7 +2936,7 @@ hoist-non-react-statics@^2.3.1:
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
   integrity sha512-rqcy4pJo55FTTLWt+bU8ukscqHeE/e9KWvsOW2b/a3afxQZhwkQdT1rPPCJ0rYXdj4vNcasY8zHTH+jF/qStxw==
 
-hoist-non-react-statics@^3.0.1, hoist-non-react-statics@^3.3.0:
+hoist-non-react-statics@^3.0.1, hoist-non-react-statics@^3.2.1, hoist-non-react-statics@^3.3.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.1.tgz#101685d3aff3b23ea213163f6e8e12f4f111e19f"
   integrity sha512-wbg3bpgA/ZqWrZuMOeJi8+SKMhr7X9TesL/rXMjTzh0p0JUBo3II8DHboYbuIXWRlttrUFxwcu/5kygrCw8fJw==
@@ -3427,6 +3465,11 @@ lodash.clone@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clone/-/lodash.clone-4.5.0.tgz#195870450f5a13192478df4bc3d23d2dea1907b6"
   integrity sha1-GVhwRQ9aExkkeN9Lw9I9LeoZB7Y=
+
+lodash.merge@^4.6.1:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
+  integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
 lodash.pad@^4.1.0:
   version "4.5.1"
@@ -4723,10 +4766,20 @@ react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.6:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.12.0.tgz#2cc0fe0fba742d97fd527c42a13bec4eeb06241c"
   integrity sha512-rPCkf/mWBtKc97aLL9/txD8DZdemK0vkA3JMLShjlJB3Pj3s+lpf1KaBzMfQrAmhMQB0n1cU/SUGgKKBCe837Q==
 
+react-lifecycles-compat@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
+  integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
+
 react-native-branch@~3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/react-native-branch/-/react-native-branch-3.0.1.tgz#5b07b61cbd290168cd3c3662e017ebe0f356d2ca"
   integrity sha512-vbcYxPZlpF5f39GAEUF8kuGQqCNeD3E6zEdvtOq8oCGZunHXlWlKgAS6dgBKCvsHvXgHuMtpvs39VgOp8DaKig==
+
+react-native-eva-icons@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-eva-icons/-/react-native-eva-icons-1.1.0.tgz#323e55d759187edc216d049e7c0012a27383e0ed"
+  integrity sha512-0k6sbiKoHxmmbCgAZTHj6llcdcwtbyZJ1E2AK0my7QU0WRaWwqWMep5AUlMbrIiuYE9mkMZiabEXYcfn3ir2PA==
 
 react-native-gesture-handler@~1.3.0:
   version "1.3.0"
@@ -4742,7 +4795,7 @@ react-native-reanimated@~1.2.0:
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.2.0.tgz#9219227a52a5dfa4d34c324596d6726ccd874293"
   integrity sha512-vkWRHrPK5qfHP/ZawlRoo38oeYe9NZaaOH/lmFxRcsKzaSK6x3H5ZPXI8lK6MfTLveqwo1QhJje3zIKXO4nQQw==
 
-react-native-safe-area-view@^0.14.1:
+react-native-safe-area-view@^0.14.1, react-native-safe-area-view@^0.14.6:
   version "0.14.8"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.14.8.tgz#ef33c46ff8164ae77acad48c3039ec9c34873e5b"
   integrity sha512-MtRSIcZNstxv87Jet+UsPhEd1tpGe8cVskDXlP657x6rHpSrbrc+y13ZNXrwAgGNNhqQNX7UJT68ZIq//ZRmvw==
@@ -4755,6 +4808,16 @@ react-native-safe-area-view@^0.14.1:
   integrity sha512-tOxHGQUN83MTmQB4ghoQkibqOdGiX4JQEmeyEv96MKWO/x8T2PJv84ECUos9hD3blPRQwVwSpAid1PPPhrVEaw==
   dependencies:
     debounce "^1.2.0"
+
+react-native-svg@9.9.5:
+  version "9.9.5"
+  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.9.5.tgz#5f9fa196ac78ac10c0ce85152e429dba98353904"
+  integrity sha512-nqiPIsC1jB1TUK+ii7ryWc2pDU+YFJojj3awWXOKEP214gfKvjypjvjmW4PCcH70uBLUp3AwaDK2GI/hmbmaoA==
+
+react-native-tab-view@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-2.11.0.tgz#2e57d1f617ccc88c7f452708804f3409f880b700"
+  integrity sha512-vqetlxGO7A8bnqvXcB50MWpRZAImXFrDGz1WCQKdCqe03Ey3ZzENe7yLuWrtBJYlepGfOLAsmCXv+wW82Yfm1w==
 
 react-native-table-component@^1.2.1:
   version "1.2.1"
@@ -4843,6 +4906,16 @@ react-navigation-stack@^1.10.3:
   integrity sha512-1gksFi/g/Lg9sBhgLlD0OiEB5xnatHb4C0eNMA5tli9cTVlhq375XNPIqOiTyftibBmjdApAsZFj5srUCoOu/w==
   dependencies:
     prop-types "^15.7.2"
+
+react-navigation-tabs@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/react-navigation-tabs/-/react-navigation-tabs-2.6.2.tgz#6611f3bbc5fcbc004a96a457e1dbe8d957d09ef5"
+  integrity sha512-b7Bwio3pOyb2dJOsfICm1eXUCekULO63VitLlkslsuwB5v5qXD9u+TkuSGADPiAybRH3Fts4cQX/xA5WGsIsfg==
+  dependencies:
+    hoist-non-react-statics "^3.3.0"
+    react-lifecycles-compat "^3.0.4"
+    react-native-safe-area-view "^0.14.6"
+    react-native-tab-view "^2.11.0"
 
 react-navigation@^4.0.10:
   version "4.0.10"

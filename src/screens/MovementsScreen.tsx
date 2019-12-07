@@ -1,8 +1,9 @@
 import { FontAwesome } from '@expo/vector-icons';
+import { Divider, Layout, Text, TopNavigation } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 import Spinner from '../components/Spinner';
 import movementsStore from '../stores/movements-store';
 
@@ -17,60 +18,68 @@ const MovementsScreen = ({ navigation }) => {
     movementsStore.save(text);
   };
 
-  const renderListItem = item => {
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={styles.item}>{item.val} </Text>
-        <TouchableOpacity
-          onPress={() => movementsStore.remove(item.key)}
-          style={{
-            alignSelf: 'center',
-            marginLeft: 15,
-            padding: 5,
-          }}
-        >
-          <FontAwesome style={{ color: 'red' }} name="times" />
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <TopNavigation title="Movements" alignment="center" />
+      <Divider />
+      <Layout style={{ flex: 1 }}>
+        {movementsStore.movementList ? (
+          <View>
+            <View style={{ margin: 10, flexDirection: 'row' }}>
+              <TextInput
+                value={text}
+                onChangeText={val => setText(val)}
+                style={{
+                  borderBottomColor: '#f3f3f3',
+                  borderBottomWidth: 2,
+                  flexGrow: 0.98,
+                }}
+                autoCorrect={false}
+                placeholder="Add a movement"
+              />
+              <TouchableOpacity
+                onPress={save}
+                style={{
+                  marginLeft: 15,
+                  borderWidth: 2,
+                  borderColor: '#333',
+                  borderRadius: 10,
+                  padding: 5,
+                }}
+              >
+                <FontAwesome name="check" />
+              </TouchableOpacity>
+            </View>
+            {movementsStore.movementList && movementsStore.movementList.length ? (
+              <FlatList
+                data={movementsStore.movementList}
+                renderItem={({ item }) => renderListItem(item)}
+              />
+            ) : null}
+          </View>
+        ) : (
+          <Spinner />
+        )}
+      </Layout>
+    </SafeAreaView>
+  );
+};
 
-  return movementsStore.movementList ? (
-    <View style={styles.container}>
-      <View style={{ margin: 10, flexDirection: 'row' }}>
-        <TextInput
-          value={text}
-          onChangeText={val => setText(val)}
-          style={{
-            borderBottomColor: '#f3f3f3',
-            borderBottomWidth: 2,
-            flexGrow: 0.98,
-          }}
-          autoCorrect={false}
-          placeholder="Add a movement"
-        />
-        <TouchableOpacity
-          onPress={save}
-          style={{
-            marginLeft: 15,
-            borderWidth: 2,
-            borderColor: '#333',
-            borderRadius: 10,
-            padding: 5,
-          }}
-        >
-          <FontAwesome name="check" />
-        </TouchableOpacity>
-      </View>
-      {movementsStore.movementList && movementsStore.movementList.length ? (
-        <FlatList
-          data={movementsStore.movementList}
-          renderItem={({ item }) => renderListItem(item)}
-        />
-      ) : null}
+const renderListItem = item => {
+  return (
+    <View style={{ flexDirection: 'row', margin: 10 }}>
+      <Text style={styles.item}>{item.val} </Text>
+      <TouchableOpacity
+        onPress={() => movementsStore.remove(item.key)}
+        style={{
+          alignSelf: 'center',
+          marginLeft: 15,
+          padding: 5,
+        }}
+      >
+        <FontAwesome style={{ color: 'red' }} name="times" />
+      </TouchableOpacity>
     </View>
-  ) : (
-    <Spinner />
   );
 };
 
