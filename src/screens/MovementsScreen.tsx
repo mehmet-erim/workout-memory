@@ -1,5 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { Divider, Layout, Text, TopNavigation } from '@ui-kitten/components';
+import { Divider, Layout, Text, TopNavigation, Input, Icon } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
@@ -16,6 +16,7 @@ const MovementsScreen = ({ navigation }) => {
 
   const save = () => {
     movementsStore.save(text);
+    setText('');
   };
 
   return (
@@ -26,28 +27,35 @@ const MovementsScreen = ({ navigation }) => {
         {movementsStore.movementList ? (
           <View>
             <View style={{ margin: 10, flexDirection: 'row' }}>
-              <TextInput
+              <Input
+                label="New movement"
                 value={text}
                 onChangeText={val => setText(val)}
                 style={{
-                  borderBottomColor: '#f3f3f3',
-                  borderBottomWidth: 2,
                   flexGrow: 0.98,
                 }}
                 autoCorrect={false}
-                placeholder="Add a movement"
+                returnKeyType="next"
+                returnKeyLabel="Save"
+                onSubmitEditing={save}
               />
               <TouchableOpacity
                 onPress={save}
                 style={{
-                  marginLeft: 15,
-                  borderWidth: 2,
-                  borderColor: '#333',
-                  borderRadius: 10,
-                  padding: 5,
+                  alignContent: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                <FontAwesome name="check" />
+                <Icon
+                  name="checkmark-outline"
+                  style={{
+                    height: 24,
+                    marginHorizontal: 8,
+                    tintColor: '#8F9BB3',
+                    width: 24,
+                    marginTop: 10,
+                  }}
+                />
               </TouchableOpacity>
             </View>
             {movementsStore.movementList && movementsStore.movementList.length ? (
