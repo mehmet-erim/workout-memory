@@ -72,18 +72,28 @@ const WorkoutScreen = ({ navigation }) => {
     setOrder(0);
   };
 
+  const setInitialData = () => {
+    const { date, title, elements } = workoutStore.selectedWorkout;
+    setElements(elements);
+    setTableDatas(elements);
+    setDate(new Date(date));
+    setTitle(title);
+  };
+
   if (!movementsStore.movements && !movementsStore.movementList.length) {
-    movementsStore.get();
+    movementsStore.get().then(() => setInitialData());
+  } else if (workoutStore.selectedWorkout && !title) {
+    setInitialData();
   }
 
   const save = () => {
-    console.log(date);
-    workoutStore
-      .save({ date, elements, title, day: new Date() }, workoutIndex)
-      .then(() => navigation.navigate('Home'));
+    workoutStore.save({ date, elements, title, day: new Date() }, workoutIndex).then(() => {
+      navigation.navigate('Home');
+      workoutStore.selectedWorkout = null;
+    });
   };
 
-  return movementsStore.movementList.length && (!workoutIndex || workoutStore.selectedWorkout) ? (
+  return movementsStore.movementList.length && (!workoutIndex || title) ? (
     <View style={styles.container}>
       <RoundedButton
         style={{ position: 'absolute', right: 20, bottom: 20 }}

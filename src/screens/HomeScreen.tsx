@@ -14,22 +14,18 @@ const HomeScreen = ({ navigation }) => {
     workoutStore.get();
   }
 
-  const logout = () => {
-    firebaseInstance.auth().signOut();
-    navigation.navigate('Login');
+  const navigateToWorkout = item => {
+    workoutStore.getOne(item.key).then(() => {
+      navigation.navigate('Workout', {
+        workoutIndex: item.key,
+      });
+    });
   };
 
   const renderListItem = item => {
     return (
       <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Workout', {
-              workoutIndex: item.key,
-              test: 'test',
-            })
-          }
-        >
+        <TouchableOpacity onPress={() => navigateToWorkout(item)}>
           <Text style={styles.item}>{item.title}</Text>
           <Text>{new Date(item.date).toString()}</Text>
         </TouchableOpacity>

@@ -8,7 +8,7 @@ let index = 0;
 
 class WorkoutsStore {
   @observable workouts;
-  @observable selectedWorkout = {};
+  @observable selectedWorkout;
   @computed get workoutList() {
     if (!this.workouts || !Object.keys(this.workouts).length) {
       return [];
@@ -36,7 +36,7 @@ class WorkoutsStore {
       .ref(`users/${authStore.currentUserUid}/workouts/${key}`)
       .once('value')
       .then(snapshot => {
-        this.selectedWorkout = snapshot.val() || {};
+        this.selectedWorkout = { ...(snapshot.val() || {}), key };
       });
   }
 
