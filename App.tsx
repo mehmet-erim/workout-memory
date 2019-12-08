@@ -11,6 +11,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import MovementsScreen from './src/screens/MovementsScreen';
 import WorkoutScreen from './src/screens/WorkoutScreen';
 import TabBarComponent from './src/components/TabBarComponent';
+import { StatusBar } from 'react-native';
 
 const TabNavigator = createBottomTabNavigator(
   {
@@ -47,6 +48,7 @@ const AppContainer = createAppContainer(
 export default function App() {
   return (
     <React.Fragment>
+      <StatusBar hidden={true} />
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider mapping={mapping} theme={lightTheme}>
         <AppContainer />

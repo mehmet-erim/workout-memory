@@ -1,22 +1,39 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { Divider, Layout, Text, TopNavigation, Input, Icon } from '@ui-kitten/components';
+import {
+  Divider,
+  Layout,
+  Text,
+  TopNavigation,
+  Input,
+  Icon,
+  Modal,
+  Button,
+  ListItem,
+} from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Spinner from '../components/Spinner';
 import movementsStore from '../stores/movements-store';
+import RoundedButton from '../components/RoundedButton';
+import Swipeout from 'react-native-swipeout';
+import colors from '../styles/colors';
 
 const MovementsScreen = ({ navigation }) => {
   const [text, setText] = useState('');
+  const [swipedKey, setSwipedKey] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   if (!movementsStore.movements && !movementsStore.movementList.length) {
     movementsStore.get();
   }
 
   const save = () => {
+    if (!text) return;
     movementsStore.save(text);
     setText('');
+    setModalVisible(false);
   };
 
   return (
@@ -24,70 +41,55 @@ const MovementsScreen = ({ navigation }) => {
       <TopNavigation title="Movements" alignment="center" />
       <Divider />
       <Layout style={{ flex: 1 }}>
-        {movementsStore.movementList ? (
-          <View>
-            <View style={{ margin: 10, flexDirection: 'row' }}>
-              <Input
-                label="New movement"
-                value={text}
-                onChangeText={val => setText(val)}
-                style={{
-                  flexGrow: 0.98,
-                }}
-                autoCorrect={false}
-                returnKeyType="done"
-                returnKeyLabel="Save"
-                onSubmitEditing={save}
-              />
-              <TouchableOpacity
-                onPress={save}
-                style={{
-                  alignContent: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Icon
-                  name="checkmark-outline"
-                  style={{
-                    height: 24,
-                    marginHorizontal: 8,
-                    tintColor: '#8F9BB3',
-                    width: 24,
-                    marginTop: 10,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-            {movementsStore.movementList && movementsStore.movementList.length ? (
-              <FlatList
-                data={movementsStore.movementList}
-                renderItem={({ item }) => renderListItem(item)}
-              />
-            ) : null}
-          </View>
-        ) : (
-          <Spinner />
-        )}
+        <RoundedButton
+          style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
+          onPress={() => setModalVisible(true)}
+          size={40}
+        />
+        {movementsStore.movementList.map(movement => (
+          <Swipeout
+            right={[
+              {
+                text: 'Remove',
+                onPress: () => movementsStore.remove(swipedKey),
+                backgroundColor: '#c62828',
+              },
+            ]}
+            key={movement.key}
+            onOpen={() => setSwipedKey(movement.key)}
+          >
+            <ListItem title={movement.val} />
+          </Swipeout>
+        ))}
       </Layout>
-    </SafeAreaView>
-  );
-};
 
-const renderListItem = item => {
-  return (
-    <View style={{ flexDirection: 'row', margin: 10 }}>
-      <Text style={styles.item}>{item.val} </Text>
-      <TouchableOpacity
-        onPress={() => movementsStore.remove(item.key)}
-        style={{
-          alignSelf: 'center',
-          marginLeft: 15,
-          padding: 5,
-        }}
+      <Modal
+        allowBackdrop={true}
+        backdropStyle={styles.backdrop}
+        visible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
       >
-        <FontAwesome style={{ color: 'red' }} name="times" />
-      </TouchableOpacity>
-    </View>
+        <Layout level="3" style={styles.modalContainer}>
+          <View style={{ width: '100%' }}>
+            <Input
+              label="New movement"
+              value={text}
+              onChangeText={val => setText(val)}
+              style={{
+                flexGrow: 0.98,
+              }}
+              autoCorrect={false}
+              returnKeyType="done"
+              returnKeyLabel="Save"
+              onSubmitEditing={save}
+            />
+            <Button style={{ marginTop: 10 }} onPress={save}>
+              Save
+            </Button>
+          </View>
+        </Layout>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
@@ -100,6 +102,14 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     height: 44,
+  },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 350,
+    padding: 16,
+    backgroundColor: '#fff',
   },
 });
 

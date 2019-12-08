@@ -6,7 +6,6 @@ export function getNextKey(data: any, prefix: string) {
   const index =
     Object.keys(data).reduce((acc, key) => {
       const keyIndex = Number(key.replace(prefix, ''));
-      console.log(keyIndex);
       if (keyIndex > acc) {
         return keyIndex;
       }

@@ -64,6 +64,8 @@ const WorkoutScreen = ({ navigation }) => {
   };
 
   const addNewElement = () => {
+    if (!movement) return;
+
     const newElements = [
       ...elements,
       { movement: movement.key, setCount, repCount, weight, notes },
@@ -107,6 +109,8 @@ const WorkoutScreen = ({ navigation }) => {
   }
 
   const save = () => {
+    if (!title || !date) return;
+
     workoutStore.save({ date, elements, title, day: new Date() }, workoutIndex).then(() => {
       navigation.navigate('Home');
 
@@ -125,8 +129,6 @@ const WorkoutScreen = ({ navigation }) => {
 
   // const onBlurWeight = (event: SyntheticEvent) => {
   //   const text = snq(() => (event.nativeEvent as any).text);
-
-  //   console.log(text.slice(0, text.lenght - 1));
 
   //   if (text) {
   //     setWeight(text[text.length - 1] === '.' ? +text.slice(0, text.lenght - 1) : +text);
@@ -175,7 +177,7 @@ const WorkoutScreen = ({ navigation }) => {
           value={notes}
           onChangeText={text => setNotes(text)}
         />
-        <Button style={{ marginTop: 10 }} onPress={addNewElement}>
+        <Button style={{ marginTop: 10 }} onPress={addNewElement} disabled={!movement}>
           Save
         </Button>
       </View>
