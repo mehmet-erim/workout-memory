@@ -1,5 +1,12 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { Divider, Layout, Text, TopNavigation } from '@ui-kitten/components';
+import {
+  Divider,
+  Layout,
+  Text,
+  TopNavigation,
+  TopNavigationAction,
+  Icon,
+} from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -7,19 +14,24 @@ import { SafeAreaView } from 'react-navigation';
 import RoundedButton from '../components/RoundedButton';
 import workoutStore from '../stores/workout-store';
 
+const CheckIcon = style => <Icon {...style} name="log-out-outline" />;
+
 const HomeScreen = ({ navigation }) => {
   if (!workoutStore.workouts && !workoutStore.workoutList.length) {
     workoutStore.get();
   }
+  const RightActions = () => (
+    <TopNavigationAction icon={CheckIcon} onPress={() => navigation.navigate('Login')} />
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <TopNavigation title="Workouts" alignment="center" />
+      <TopNavigation title="Workouts" alignment="center" rightControls={RightActions()} />
       <Divider />
       <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <RoundedButton
           style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
-          onPress={() => navigation.navigate('Workout', { test: 'test' })}
+          onPress={() => navigation.navigate('Workout', { workoutIndex: null })}
           size={40}
         />
         <FlatList

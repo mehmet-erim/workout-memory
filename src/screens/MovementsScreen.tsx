@@ -35,7 +35,7 @@ const MovementsScreen = ({ navigation }) => {
                   flexGrow: 0.98,
                 }}
                 autoCorrect={false}
-                returnKeyType="next"
+                returnKeyType="done"
                 returnKeyLabel="Save"
                 onSubmitEditing={save}
               />

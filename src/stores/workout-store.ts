@@ -51,11 +51,11 @@ class WorkoutsStore {
     if (this.workouts && !key) {
       key = getNextKey(this.workouts, 'workout');
     } else if (!key) {
-      key = '0';
+      key = 'workout0';
     }
 
     return database
-      .ref(`users/${authStore.currentUserUid}/workouts/workout${String(key)}`)
+      .ref(`users/${authStore.currentUserUid}/workouts/${String(key)}`)
       .set({ ...value, date: new Date(value.date).valueOf() })
       .then(() => this.get());
   }

@@ -1,8 +1,7 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import compare from 'just-compare';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, SyntheticEvent } from 'react';
 import { DatePickerIOS, Picker, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import Modal from '../components/Modal';
 import RoundedButton from '../components/RoundedButton';
 import { database } from '../utilities/firebase';
 import { Table, Row, Rows } from 'react-native-table-component';
@@ -21,6 +20,8 @@ import {
   Button,
   Datepicker,
   Input,
+  Select,
+  Modal,
 } from '@ui-kitten/components';
 import { SafeAreaView } from 'react-navigation';
 
@@ -30,14 +31,11 @@ const CalendarIcon = style => <Icon {...style} name="calendar" />;
 const TitleIcon = style => <Icon {...style} name="file-text-outline" />;
 
 const WorkoutScreen = ({ navigation }) => {
-  const [isOpenDatepicker, setIsOpenDatepicker] = useState(false);
-  const [isOpenMovementList, setIsOpenMovementList] = useState(false);
   const [date, setDate] = useState(new Date());
   const [title, setTitle] = useState('');
   const [setCount, setSetCount] = useState(3);
   const [repCount, setRepCount] = useState(5);
   const [weight, setWeight] = useState(0);
-  const [order, setOrder] = useState(0);
   const [notes, setNotes] = useState('');
   const [elements, setElements] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,7 +51,6 @@ const WorkoutScreen = ({ navigation }) => {
         (acc, val) => [
           ...acc,
           [
-            ,
             movementsStore.movements[val.movement],
             val.setCount,
             val.repCount,
@@ -67,8 +64,11 @@ const WorkoutScreen = ({ navigation }) => {
   };
 
   const addNewElement = () => {
-    const newElements = [...elements, { movement, setCount, repCount, weight, notes, order }];
-    setElements([...elements, { movement, setCount, repCount, weight, notes, order }]);
+    const newElements = [
+      ...elements,
+      { movement: movement.key, setCount, repCount, weight, notes },
+    ];
+    setElements(newElements);
     setTableDatas(newElements);
     setModalVisible(false);
 
@@ -77,7 +77,6 @@ const WorkoutScreen = ({ navigation }) => {
     setRepCount(5);
     setWeight(0);
     setNotes('');
-    setOrder(0);
   };
 
   const setInitialData = () => {
@@ -88,27 +87,100 @@ const WorkoutScreen = ({ navigation }) => {
     setTitle(title);
   };
 
+  const clearState = () => {
+    setElements([]);
+    setTableData([]);
+    setDate(new Date());
+    setTitle(null);
+    setMovement(null);
+    setSetCount(3);
+    setRepCount(5);
+    setWeight(0);
+    setNotes('');
+    workoutStore.selectedWorkout = null;
+  };
+
   if (!movementsStore.movements && !movementsStore.movementList.length) {
     movementsStore.get().then(() => setInitialData());
-  } else if (workoutStore.selectedWorkout && !title) {
+  } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !title) {
     setInitialData();
   }
 
   const save = () => {
     workoutStore.save({ date, elements, title, day: new Date() }, workoutIndex).then(() => {
       navigation.navigate('Home');
-      workoutStore.selectedWorkout = null;
+
+      clearState();
     });
   };
 
   const navigateBack = () => {
+    clearState();
     navigation.goBack();
   };
+
+  const onChangeWeight = text => {
+    setWeight(text[text.length - 1] === '.' ? text : +text);
+  };
+
+  // const onBlurWeight = (event: SyntheticEvent) => {
+  //   const text = snq(() => (event.nativeEvent as any).text);
+
+  //   console.log(text.slice(0, text.lenght - 1));
+
+  //   if (text) {
+  //     setWeight(text[text.length - 1] === '.' ? +text.slice(0, text.lenght - 1) : +text);
+  //   }
+  // };
 
   const BackAction = () => <TopNavigationAction icon={BackIcon} onPress={navigateBack} />;
   const RightActions = () => <TopNavigationAction icon={CheckIcon} onPress={save} />;
 
-  console.log('rendered');
+  const renderModalElement = () => (
+    <Layout level="3" style={styles.modalContainer}>
+      <View style={{ width: '100%' }}>
+        <Select
+          data={movementsStore.movementList.map(data => ({
+            text: data.val,
+            key: data.key,
+          }))}
+          selectedOption={movement}
+          onSelect={(selected: { text: string; key: string }) => setMovement(selected)}
+        />
+        <View style={{ marginTop: 10 }}>
+          <Input
+            label="Set"
+            keyboardType="numeric"
+            value={String(setCount)}
+            onChangeText={text => setSetCount(+text)}
+          />
+        </View>
+        <Input
+          label="Rep"
+          keyboardType="numeric"
+          placeholder="Rep"
+          value={String(repCount)}
+          onChangeText={text => setRepCount(+text)}
+        />
+        <Input
+          label="Weight"
+          keyboardType="numeric"
+          placeholder="Weight"
+          value={String(weight)}
+          onChangeText={onChangeWeight}
+        />
+        <Input
+          label="Notes"
+          placeholder="Notes"
+          value={notes}
+          onChangeText={text => setNotes(text)}
+        />
+        <Button style={{ marginTop: 10 }} onPress={addNewElement}>
+          Save
+        </Button>
+      </View>
+    </Layout>
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -147,77 +219,13 @@ const WorkoutScreen = ({ navigation }) => {
               </View>
             </View>
 
-            <Modal modalVisible={modalVisible} onChangeModalVisible={val => setModalVisible(val)}>
-              <View>
-                <TouchableOpacity onPress={() => setIsOpenMovementList(!isOpenMovementList)}>
-                  <Text>
-                    {isOpenMovementList ? (
-                      <FontAwesome name="times" size={30} />
-                    ) : (
-                      <MaterialIcons name="fitness-center" size={30} />
-                    )}
-                    {movementsStore.movements[movement]}
-                  </Text>
-                </TouchableOpacity>
-                {isOpenMovementList ? (
-                  <Picker
-                    selectedValue={movement}
-                    onValueChange={(itemValue, itemIndex) => setMovement(itemValue)}
-                  >
-                    <Picker.Item label="" value={null} />
-                    {movementsStore.movementList.map(data => (
-                      <Picker.Item key={data.key} label={data.val} value={data.key} />
-                    ))}
-                  </Picker>
-                ) : null}
-
-                <View style={{ marginTop: 10 }}>
-                  <Text>Set:</Text>
-                  <TextInput
-                    keyboardType="numeric"
-                    placeholder="Set"
-                    value={String(setCount)}
-                    onChangeText={text => setSetCount(+text)}
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text>Rep:</Text>
-                  <TextInput
-                    keyboardType="numeric"
-                    placeholder="Rep"
-                    value={String(repCount)}
-                    onChangeText={text => setRepCount(+text)}
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text>Weight:</Text>
-                  <TextInput
-                    keyboardType="numeric"
-                    placeholder="Weight"
-                    value={String(weight)}
-                    onChangeText={text => setWeight(+text)}
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text>Notes:</Text>
-                  <TextInput
-                    numberOfLines={4}
-                    placeholder="Notes"
-                    value={notes}
-                    onChangeText={text => setNotes(text)}
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text>Order:</Text>
-                  <TextInput
-                    keyboardType="numeric"
-                    placeholder="Order"
-                    value={String(order)}
-                    onChangeText={text => setOrder(+text)}
-                  />
-                </View>
-                <Button onPress={addNewElement}>Save</Button>
-              </View>
+            <Modal
+              allowBackdrop={true}
+              backdropStyle={styles.backdrop}
+              visible={modalVisible}
+              onBackdropPress={() => setModalVisible(false)}
+            >
+              {renderModalElement()}
             </Modal>
           </View>
         ) : (
@@ -240,6 +248,14 @@ const styles = StyleSheet.create({
   },
   head: { height: 40, backgroundColor: '#f1f8ff' },
   text: { margin: 6 },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 350,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
 });
 
 export default observer(WorkoutScreen);

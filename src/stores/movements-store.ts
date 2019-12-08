@@ -41,7 +41,7 @@ class MovementsStore {
     if (this.movements && !key) {
       key = getNextKey(this.movements, 'movement');
     } else if (!key) {
-      key = '0';
+      key = 'movement0';
     }
 
     return database
