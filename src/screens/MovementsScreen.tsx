@@ -1,24 +1,20 @@
-import { FontAwesome } from '@expo/vector-icons';
 import {
-  Divider,
-  Layout,
-  Text,
-  TopNavigation,
-  Input,
-  Icon,
-  Modal,
   Button,
+  Divider,
+  Input,
+  Layout,
   ListItem,
+  Modal,
+  TopNavigation,
 } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
-import Spinner from '../components/Spinner';
-import movementsStore from '../stores/movements-store';
-import RoundedButton from '../components/RoundedButton';
+import { StyleSheet, View } from 'react-native';
 import Swipeout from 'react-native-swipeout';
-import colors from '../styles/colors';
+import { SafeAreaView } from 'react-navigation';
+import RoundedButton from '../components/RoundedButton';
+import movementsStore from '../stores/movements-store';
+import ListWrapper from '../components/ListWrapper';
 
 const MovementsScreen = ({ navigation }) => {
   const [text, setText] = useState('');
@@ -46,21 +42,23 @@ const MovementsScreen = ({ navigation }) => {
           onPress={() => setModalVisible(true)}
           size={40}
         />
-        {movementsStore.movementList.map(movement => (
-          <Swipeout
-            right={[
-              {
-                text: 'Remove',
-                onPress: () => movementsStore.remove(swipedKey),
-                backgroundColor: '#c62828',
-              },
-            ]}
-            key={movement.key}
-            onOpen={() => setSwipedKey(movement.key)}
-          >
-            <ListItem title={movement.val} />
-          </Swipeout>
-        ))}
+        <ListWrapper>
+          {movementsStore.movementList.map(movement => (
+            <Swipeout
+              right={[
+                {
+                  text: 'Remove',
+                  onPress: () => movementsStore.remove(swipedKey),
+                  backgroundColor: '#c62828',
+                },
+              ]}
+              key={movement.key}
+              onOpen={() => setSwipedKey(movement.key)}
+            >
+              <ListItem title={movement.val} />
+            </Swipeout>
+          ))}
+        </ListWrapper>
       </Layout>
 
       <Modal
