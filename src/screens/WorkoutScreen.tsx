@@ -23,14 +23,14 @@ import {
   Select,
   Modal,
 } from '@ui-kitten/components';
-import { SafeAreaView } from 'react-navigation';
+import { SafeAreaView, NavigationScreenProp, NavigationRoute } from 'react-navigation';
 
 const BackIcon = style => <Icon {...style} name="arrow-back" />;
 const CheckIcon = style => <Icon {...style} name="checkmark-outline" />;
 const CalendarIcon = style => <Icon {...style} name="calendar" />;
 const TitleIcon = style => <Icon {...style} name="file-text-outline" />;
 
-const WorkoutScreen = ({ navigation }) => {
+const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<NavigationRoute> }) => {
   const [date, setDate] = useState(new Date());
   const [title, setTitle] = useState('');
   const [setCount, setSetCount] = useState(3);
@@ -102,12 +102,6 @@ const WorkoutScreen = ({ navigation }) => {
     workoutStore.selectedWorkout = null;
   };
 
-  if (!movementsStore.movements && !movementsStore.movementList.length) {
-    movementsStore.get().then(() => setInitialData());
-  } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !title) {
-    setInitialData();
-  }
-
   const save = () => {
     if (!title || !date) return;
 
@@ -122,6 +116,16 @@ const WorkoutScreen = ({ navigation }) => {
     clearState();
     navigation.goBack();
   };
+
+  useEffect(() => {
+    if (!movementsStore.movements && !movementsStore.movementList.length) {
+      movementsStore.get().then(() => setInitialData());
+    } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !title) {
+      setInitialData();
+    } else if (!workoutStore.selectedWorkout) {
+      clearState();
+    }
+  }, [navigation]);
 
   const onChangeWeight = text => {
     setWeight(text[text.length - 1] === '.' ? text : +text);

@@ -10,7 +10,6 @@ import {
 } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import RoundedButton from '../components/RoundedButton';
 import workoutStore from '../stores/workout-store';
@@ -71,43 +70,5 @@ const HomeScreen = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const renderListItem = (item, navigation) => {
-  return (
-    <View style={{ flexDirection: 'row', margin: 10 }}>
-      <TouchableOpacity
-        onPress={() => {
-          workoutStore.getOne(item.key).then(() => {
-            navigation.navigate('Workout', {
-              workoutIndex: item.key,
-            });
-          });
-        }}
-      >
-        <Text style={styles.item}>{item.title}</Text>
-        <Text>{new Date(item.date).toString()}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => workoutStore.remove(item.key)}
-        style={{
-          alignSelf: 'center',
-          marginLeft: 15,
-          padding: 5,
-        }}
-      >
-        <FontAwesome style={{ color: 'red' }} name="times" />
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  item: {
-    padding: 10,
-    paddingLeft: 0,
-    fontSize: 18,
-    height: 44,
-  },
-});
 
 export default observer(HomeScreen);
