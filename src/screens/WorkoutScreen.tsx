@@ -1,29 +1,28 @@
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import compare from 'just-compare';
-import React, { useEffect, useState, SyntheticEvent } from 'react';
-import { DatePickerIOS, Picker, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import RoundedButton from '../components/RoundedButton';
-import { database } from '../utilities/firebase';
-import { Table, Row, Rows } from 'react-native-table-component';
-import snq from 'snq';
-import workoutStore from '../stores/workout-store';
-import Spinner from '../components/Spinner';
-import movementsStore from '../stores/movements-store';
-import { observer } from 'mobx-react';
 import {
-  Icon,
-  TopNavigation,
-  Divider,
-  Layout,
-  Text,
-  TopNavigationAction,
   Button,
   Datepicker,
+  Divider,
+  Icon,
   Input,
-  Select,
+  Layout,
   Modal,
+  Select,
+  Text,
+  TopNavigation,
+  TopNavigationAction,
+  ListItem,
 } from '@ui-kitten/components';
-import { SafeAreaView, NavigationScreenProp, NavigationRoute } from 'react-navigation';
+import { observer } from 'mobx-react';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import { NavigationRoute, NavigationScreenProp, SafeAreaView } from 'react-navigation';
+import snq from 'snq';
+import RoundedButton from '../components/RoundedButton';
+import Spinner from '../components/Spinner';
+import movementsStore from '../stores/movements-store';
+import workoutStore from '../stores/workout-store';
+import Swipeout from 'react-native-swipeout';
 
 const BackIcon = style => <Icon {...style} name="arrow-back" />;
 const CheckIcon = style => <Icon {...style} name="checkmark-outline" />;
@@ -40,28 +39,8 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   const [elements, setElements] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [movement, setMovement] = useState();
-  const [tableHead] = useState(['Movement', 'Set', 'Rep', 'Weight', 'Notes']);
-  const [tableData, setTableData] = useState([]);
 
   const workoutIndex = snq(() => navigation.state.params.workoutIndex);
-
-  const setTableDatas = els => {
-    setTableData(
-      els.reduce(
-        (acc, val) => [
-          ...acc,
-          [
-            movementsStore.movements[val.movement],
-            val.setCount,
-            val.repCount,
-            val.weight,
-            val.notes,
-          ],
-        ],
-        [],
-      ),
-    );
-  };
 
   const addNewElement = () => {
     if (!movement) return;
@@ -71,7 +50,6 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
       { movement: movement.key, setCount, repCount, weight, notes },
     ];
     setElements(newElements);
-    setTableDatas(newElements);
     setModalVisible(false);
 
     setMovement(null);
@@ -84,14 +62,12 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   const setInitialData = () => {
     const { date, title, elements } = workoutStore.selectedWorkout;
     setElements(elements);
-    setTableDatas(elements);
     setDate(new Date(date));
     setTitle(title);
   };
 
   const clearState = () => {
     setElements([]);
-    setTableData([]);
     setDate(new Date());
     setTitle(null);
     setMovement(null);
@@ -188,6 +164,21 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
     </Layout>
   );
 
+  const renderElement = ({ item, index, move, moveEnd, isActive }) => {
+    const desc = `Set: ${item.setCount} Rep: ${item.repCount} Weight: ${item.weight} ${
+      item.notes ? '\nNotes: ' + item.notes : ''
+    }`;
+    return (
+      <ListItem
+        style={{ ...(isActive && { backgroundColor: '#f3f3f3' }) }}
+        title={movementsStore.movements[item.movement]}
+        description={desc}
+        onLongPress={move}
+        onPressOut={moveEnd}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <TopNavigation alignment="center" leftControl={BackAction()} rightControls={RightActions()} />
@@ -217,11 +208,14 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
                 />
               </View>
 
-              <View style={{ marginTop: 15 }}>
-                <Table borderStyle={{ borderWidth: 2, borderColor: '#c8e1ff' }}>
-                  <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-                  <Rows data={tableData} textStyle={styles.text} />
-                </Table>
+              <View style={{ marginTop: 15, flex: 10 }}>
+                <DraggableFlatList
+                  data={elements}
+                  renderItem={renderElement}
+                  keyExtractor={(item, index) => `draggable-item-${item.movement}`}
+                  scrollPercent={5}
+                  onMoveEnd={({ data }) => setElements(data)}
+                />
               </View>
             </View>
 
