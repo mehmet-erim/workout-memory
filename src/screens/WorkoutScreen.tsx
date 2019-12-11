@@ -30,62 +30,76 @@ const CalendarIcon = style => <Icon {...style} name="calendar" />;
 const TitleIcon = style => <Icon {...style} name="file-text-outline" />;
 
 const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<NavigationRoute> }) => {
-  const [date, setDate] = useState(new Date());
-  const [title, setTitle] = useState('');
-  const [setCount, setSetCount] = useState(3);
-  const [repCount, setRepCount] = useState(5);
-  const [weight, setWeight] = useState(0);
-  const [notes, setNotes] = useState('');
-  const [elements, setElements] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [movement, setMovement] = useState();
+  const initialState = {
+    date: new Date(),
+    elements: [],
+    modalVisible: false,
+    movement: null,
+    notes: '',
+    repCount: 5,
+    selectedElementIndex: null,
+    setCount: 3,
+    title: '',
+    weight: 0,
+  };
+
+  const [state, setState] = useState(initialState);
+
+  const patchState = (value: Partial<typeof initialState>) => {
+    setState({
+      ...state,
+      ...value,
+    });
+  };
 
   const workoutIndex = snq(() => navigation.state.params.workoutIndex);
 
   const addNewElement = () => {
-    if (!movement) return;
+    if (!state.movement) return;
 
-    const newElements = [
-      ...elements,
-      { movement: movement.key, setCount, repCount, weight, notes },
-    ];
-    setElements(newElements);
-    setModalVisible(false);
-
-    setMovement(null);
-    setSetCount(3);
-    setRepCount(5);
-    setWeight(0);
-    setNotes('');
+    patchState({
+      elements: [
+        ...state.elements,
+        {
+          movement: state.movement.key,
+          setCount: state.setCount,
+          repCount: state.repCount,
+          weight: state.weight,
+          notes: state.notes,
+        },
+      ],
+      modalVisible: false,
+      movement: null,
+      setCount: 3,
+      repCount: 5,
+      weight: 0,
+      notes: '',
+    });
   };
 
   const setInitialData = () => {
     const { date, title, elements } = workoutStore.selectedWorkout;
-    setElements(elements);
-    setDate(new Date(date));
-    setTitle(title);
+    patchState({ elements, date: new Date(date), title });
   };
 
   const clearState = () => {
-    setElements([]);
-    setDate(new Date());
-    setTitle(null);
-    setMovement(null);
-    setSetCount(3);
-    setRepCount(5);
-    setWeight(0);
-    setNotes('');
+    setState(initialState);
     workoutStore.selectedWorkout = null;
   };
 
   const save = () => {
-    if (!title || !date) return;
+    if (!state.title || !state.date) return;
 
-    workoutStore.save({ date, elements, title, day: new Date() }, workoutIndex).then(() => {
-      navigation.navigate('Home');
+    workoutStore
+      .save(
+        { date: state.date, elements: state.elements, title: state.title, day: new Date() },
+        workoutIndex,
+      )
+      .then(() => {
+        navigation.navigate('Home');
 
-      clearState();
-    });
+        clearState();
+      });
   };
 
   const navigateBack = () => {
@@ -96,7 +110,7 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   useEffect(() => {
     if (!movementsStore.movements && !movementsStore.movementList.length) {
       movementsStore.get().then(() => setInitialData());
-    } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !title) {
+    } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !state.title) {
       setInitialData();
     } else if (!workoutStore.selectedWorkout) {
       clearState();
@@ -104,7 +118,7 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   }, [navigation]);
 
   const onChangeWeight = text => {
-    setWeight(text[text.length - 1] === '.' ? text : +text);
+    patchState({ weight: text[text.length - 1] === '.' ? text : +text });
   };
 
   // const onBlurWeight = (event: SyntheticEvent) => {
@@ -114,6 +128,8 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   //     setWeight(text[text.length - 1] === '.' ? +text.slice(0, text.lenght - 1) : +text);
   //   }
   // };
+
+  console.log(Math.random());
 
   const BackAction = () => <TopNavigationAction icon={BackIcon} onPress={navigateBack} />;
   const RightActions = () => <TopNavigationAction icon={CheckIcon} onPress={save} />;
@@ -126,38 +142,38 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
             text: data.val,
             key: data.key,
           }))}
-          selectedOption={movement}
-          onSelect={(selected: { text: string; key: string }) => setMovement(selected)}
+          selectedOption={state.movement}
+          onSelect={(movement: { text: string; key: string }) => patchState({ movement })}
         />
         <View style={{ marginTop: 10 }}>
           <Input
             label="Set"
             keyboardType="numeric"
-            value={String(setCount)}
-            onChangeText={text => setSetCount(+text)}
+            value={String(state.setCount)}
+            onChangeText={text => patchState({ setCount: +text })}
           />
         </View>
         <Input
           label="Rep"
           keyboardType="numeric"
           placeholder="Rep"
-          value={String(repCount)}
-          onChangeText={text => setRepCount(+text)}
+          value={String(state.repCount)}
+          onChangeText={text => patchState({ repCount: +text })}
         />
         <Input
           label="Weight"
           keyboardType="numeric"
           placeholder="Weight"
-          value={String(weight)}
+          value={String(state.weight)}
           onChangeText={onChangeWeight}
         />
         <Input
           label="Notes"
           placeholder="Notes"
-          value={notes}
-          onChangeText={text => setNotes(text)}
+          value={state.notes}
+          onChangeText={text => patchState({ notes: text })}
         />
-        <Button style={{ marginTop: 10 }} onPress={addNewElement} disabled={!movement}>
+        <Button style={{ marginTop: 10 }} onPress={addNewElement} disabled={!state.movement}>
           Save
         </Button>
       </View>
@@ -175,6 +191,14 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
         description={desc}
         onLongPress={move}
         onPressOut={moveEnd}
+        onPress={() =>
+          patchState({
+            ...item,
+            movement: { key: item.movement, text: movementsStore.movements[item.movement] },
+            selectedElementIndex: index,
+            modalVisible: true,
+          })
+        }
       />
     );
   };
@@ -186,35 +210,43 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
       <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <RoundedButton
           style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
-          onPress={() => setModalVisible(true)}
+          onPress={() =>
+            patchState({
+              selectedElementIndex: null,
+              setCount: 3,
+              repCount: 5,
+              notes: '',
+              modalVisible: true,
+            })
+          }
           size={40}
         />
-        {movementsStore.movementList.length && (!workoutIndex || title) ? (
+        {movementsStore.movementList.length && (!workoutIndex || state.title) ? (
           <View style={styles.container}>
             <View style={styles.workoutContainer}>
               <View>
                 <Input
                   placeholder="Title"
-                  value={title}
-                  onChangeText={text => setTitle(text)}
+                  value={state.title}
+                  onChangeText={text => patchState({ title: text })}
                   icon={TitleIcon}
                 />
                 <Datepicker
                   style={{ marginTop: 10 }}
                   placeholder="Pick Date"
-                  date={date}
-                  onSelect={setDate}
+                  date={state.date}
+                  onSelect={date => patchState({ date })}
                   icon={CalendarIcon}
                 />
               </View>
 
               <View style={{ marginTop: 15, flex: 10 }}>
                 <DraggableFlatList
-                  data={elements}
+                  data={state.elements}
                   renderItem={renderElement}
                   keyExtractor={(item, index) => `draggable-item-${item.movement}`}
                   scrollPercent={5}
-                  onMoveEnd={({ data }) => setElements(data)}
+                  onMoveEnd={({ data }) => patchState({ elements: data })}
                 />
               </View>
             </View>
@@ -222,8 +254,8 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
             <Modal
               allowBackdrop={true}
               backdropStyle={styles.backdrop}
-              visible={modalVisible}
-              onBackdropPress={() => setModalVisible(false)}
+              visible={state.modalVisible}
+              onBackdropPress={() => patchState({ modalVisible: false })}
             >
               {renderModalElement()}
             </Modal>
