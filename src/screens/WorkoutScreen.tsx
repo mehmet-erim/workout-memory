@@ -57,8 +57,18 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   const addNewElement = () => {
     if (!state.movement) return;
 
-    patchState({
-      elements: [
+    let elements = state.elements;
+    if (Number.isInteger(state.selectedElementIndex)) {
+      console.log('geldi');
+      elements[state.selectedElementIndex] = {
+        movement: state.movement.key,
+        setCount: state.setCount,
+        repCount: state.repCount,
+        weight: state.weight,
+        notes: state.notes,
+      };
+    } else {
+      elements = [
         ...state.elements,
         {
           movement: state.movement.key,
@@ -67,13 +77,27 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
           weight: state.weight,
           notes: state.notes,
         },
-      ],
+      ];
+    }
+
+    patchState({
+      elements,
       modalVisible: false,
       movement: null,
       setCount: 3,
       repCount: 5,
       weight: 0,
       notes: '',
+    });
+  };
+
+  const removeElement = () => {
+    patchState({
+      elements: [
+        ...state.elements.slice(0, state.selectedElementIndex),
+        ...state.elements.slice(state.selectedElementIndex + 1),
+      ],
+      modalVisible: false,
     });
   };
 
@@ -129,8 +153,6 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
   //   }
   // };
 
-  console.log(Math.random());
-
   const BackAction = () => <TopNavigationAction icon={BackIcon} onPress={navigateBack} />;
   const RightActions = () => <TopNavigationAction icon={CheckIcon} onPress={save} />;
 
@@ -173,9 +195,19 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
           value={state.notes}
           onChangeText={text => patchState({ notes: text })}
         />
-        <Button style={{ marginTop: 10 }} onPress={addNewElement} disabled={!state.movement}>
-          Save
-        </Button>
+        <View>
+          <Button style={{ marginTop: 10 }} onPress={addNewElement} disabled={!state.movement}>
+            Save
+          </Button>
+          {state.selectedElementIndex || state.selectedElementIndex === 0 ? (
+            <Button
+              style={{ marginTop: 10, backgroundColor: '#c62828', borderColor: '#c62828' }}
+              onPress={removeElement}
+            >
+              Remove
+            </Button>
+          ) : null}
+        </View>
       </View>
     </Layout>
   );
@@ -216,6 +248,8 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
               setCount: 3,
               repCount: 5,
               notes: '',
+              weight: 0,
+              movement: null,
               modalVisible: true,
             })
           }
