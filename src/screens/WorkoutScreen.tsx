@@ -5,24 +5,22 @@ import {
   Icon,
   Input,
   Layout,
+  ListItem,
   Modal,
   Select,
-  Text,
   TopNavigation,
   TopNavigationAction,
-  ListItem,
 } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { NavigationRoute, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import snq from 'snq';
 import RoundedButton from '../components/RoundedButton';
-import Spinner from '../components/Spinner';
+import loadingStore from '../stores/loading-store';
 import movementsStore from '../stores/movements-store';
 import workoutStore from '../stores/workout-store';
-import Swipeout from 'react-native-swipeout';
 
 const BackIcon = style => <Icon {...style} name="arrow-back" />;
 const CheckIcon = style => <Icon {...style} name="checkmark-outline" />;
@@ -133,7 +131,11 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
 
   useEffect(() => {
     if (!movementsStore.movements && !movementsStore.movementList.length) {
-      movementsStore.get().then(() => setInitialData());
+      loadingStore.enabled = true;
+      movementsStore
+        .get()
+        .then(() => setInitialData())
+        .finally(() => (loadingStore.enabled = false));
     } else if (workoutStore.selectedWorkout && workoutStore.selectedWorkout.title && !state.title) {
       setInitialData();
     } else if (!workoutStore.selectedWorkout) {
@@ -255,48 +257,44 @@ const WorkoutScreen = ({ navigation }: { navigation: NavigationScreenProp<Naviga
           }
           size={40}
         />
-        {movementsStore.movementList.length && (!workoutIndex || state.title) ? (
-          <View style={styles.container}>
-            <View style={styles.workoutContainer}>
-              <View>
-                <Input
-                  placeholder="Title"
-                  value={state.title}
-                  onChangeText={text => patchState({ title: text })}
-                  icon={TitleIcon}
-                />
-                <Datepicker
-                  style={{ marginTop: 10 }}
-                  placeholder="Pick Date"
-                  date={state.date}
-                  onSelect={date => patchState({ date })}
-                  icon={CalendarIcon}
-                />
-              </View>
-
-              <View style={{ marginTop: 15, flex: 10 }}>
-                <DraggableFlatList
-                  data={state.elements}
-                  renderItem={renderElement}
-                  keyExtractor={(item, index) => `draggable-item-${item.movement}`}
-                  scrollPercent={5}
-                  onMoveEnd={({ data }) => patchState({ elements: data })}
-                />
-              </View>
+        <View style={styles.container}>
+          <View style={styles.workoutContainer}>
+            <View>
+              <Input
+                placeholder="Title"
+                value={state.title}
+                onChangeText={text => patchState({ title: text })}
+                icon={TitleIcon}
+              />
+              <Datepicker
+                style={{ marginTop: 10 }}
+                placeholder="Pick Date"
+                date={state.date}
+                onSelect={date => patchState({ date })}
+                icon={CalendarIcon}
+              />
             </View>
 
-            <Modal
-              allowBackdrop={true}
-              backdropStyle={styles.backdrop}
-              visible={state.modalVisible}
-              onBackdropPress={() => patchState({ modalVisible: false })}
-            >
-              {renderModalElement()}
-            </Modal>
+            <View style={{ marginTop: 15, flex: 10 }}>
+              <DraggableFlatList
+                data={state.elements}
+                renderItem={renderElement}
+                keyExtractor={(item, index) => `draggable-item-${item.movement}`}
+                scrollPercent={5}
+                onMoveEnd={({ data }) => patchState({ elements: data })}
+              />
+            </View>
           </View>
-        ) : (
-          <Spinner />
-        )}
+
+          <Modal
+            allowBackdrop={true}
+            backdropStyle={styles.backdrop}
+            visible={state.modalVisible}
+            onBackdropPress={() => patchState({ modalVisible: false })}
+          >
+            {renderModalElement()}
+          </Modal>
+        </View>
       </Layout>
     </SafeAreaView>
   );

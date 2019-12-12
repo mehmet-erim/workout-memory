@@ -11,10 +11,11 @@ import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Swipeout from 'react-native-swipeout';
-import { SafeAreaView } from 'react-navigation';
+import { SafeAreaView, ScrollView } from 'react-navigation';
 import RoundedButton from '../components/RoundedButton';
 import movementsStore from '../stores/movements-store';
 import ListWrapper from '../components/ListWrapper';
+import loadingStore from '../stores/loading-store';
 
 const MovementsScreen = ({ navigation }) => {
   const [text, setText] = useState('');
@@ -22,7 +23,8 @@ const MovementsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   if (!movementsStore.movements && !movementsStore.movementList.length) {
-    movementsStore.get();
+    loadingStore.enabled = true;
+    movementsStore.get().finally(() => (loadingStore.enabled = false));
   }
 
   const save = () => {
@@ -42,23 +44,25 @@ const MovementsScreen = ({ navigation }) => {
           onPress={() => setModalVisible(true)}
           size={40}
         />
-        <ListWrapper>
-          {movementsStore.movementList.map(movement => (
-            <Swipeout
-              right={[
-                {
-                  text: 'Remove',
-                  onPress: () => movementsStore.remove(swipedKey),
-                  backgroundColor: '#c62828',
-                },
-              ]}
-              key={movement.key}
-              onOpen={() => setSwipedKey(movement.key)}
-            >
-              <ListItem title={movement.val} />
-            </Swipeout>
-          ))}
-        </ListWrapper>
+        <ScrollView style={{ marginBottom: 15 }}>
+          <ListWrapper>
+            {movementsStore.movementList.map(movement => (
+              <Swipeout
+                right={[
+                  {
+                    text: 'Remove',
+                    onPress: () => movementsStore.remove(swipedKey),
+                    backgroundColor: '#c62828',
+                  },
+                ]}
+                key={movement.key}
+                onOpen={() => setSwipedKey(movement.key)}
+              >
+                <ListItem title={movement.val} />
+              </Swipeout>
+            ))}
+          </ListWrapper>
+        </ScrollView>
       </Layout>
 
       <Modal

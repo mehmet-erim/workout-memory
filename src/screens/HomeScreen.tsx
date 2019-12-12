@@ -1,21 +1,19 @@
-import { FontAwesome } from '@expo/vector-icons';
 import {
   Divider,
+  Icon,
   Layout,
-  Text,
+  ListItem,
   TopNavigation,
   TopNavigationAction,
-  Icon,
-  ListItem,
 } from '@ui-kitten/components';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
-import { SafeAreaView } from 'react-navigation';
-import RoundedButton from '../components/RoundedButton';
-import workoutStore from '../stores/workout-store';
 import Swipeout from 'react-native-swipeout';
-import snq from 'snq';
+import { SafeAreaView, ScrollView } from 'react-navigation';
 import ListWrapper from '../components/ListWrapper';
+import RoundedButton from '../components/RoundedButton';
+import loadingStore from '../stores/loading-store';
+import workoutStore from '../stores/workout-store';
 
 const CheckIcon = style => <Icon {...style} name="log-out-outline" />;
 
@@ -23,7 +21,8 @@ const HomeScreen = ({ navigation }) => {
   const [swipedKey, setSwipedKey] = useState('');
 
   if (!workoutStore.workouts && !workoutStore.workoutList.length) {
-    workoutStore.get();
+    loadingStore.enabled = true;
+    workoutStore.get().finally(() => (loadingStore.enabled = false));
   }
   const RightActions = () => (
     <TopNavigationAction icon={CheckIcon} onPress={() => navigation.navigate('Login')} />
@@ -39,33 +38,39 @@ const HomeScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('Workout', { workoutIndex: null })}
           size={40}
         />
-        <ListWrapper>
-          {workoutStore.workoutList.map(workout => (
-            <Swipeout
-              right={[
-                {
-                  text: 'Remove',
-                  onPress: () => workoutStore.remove(swipedKey),
-                  backgroundColor: '#c62828',
-                },
-              ]}
-              onOpen={() => setSwipedKey(workout.key)}
-              key={workout.key}
-            >
-              <ListItem
-                title={workout.title}
-                description={'' + new Date(workout.date)}
-                onPress={() =>
-                  workoutStore.getOne(workout.key).then(() => {
-                    navigation.navigate('Workout', {
-                      workoutIndex: workout.key,
-                    });
-                  })
-                }
-              />
-            </Swipeout>
-          ))}
-        </ListWrapper>
+        <ScrollView style={{ marginBottom: 15 }}>
+          <ListWrapper>
+            {workoutStore.workoutList.map(workout => (
+              <Swipeout
+                right={[
+                  {
+                    text: 'Remove',
+                    onPress: () => workoutStore.remove(swipedKey),
+                    backgroundColor: '#c62828',
+                  },
+                ]}
+                onOpen={() => setSwipedKey(workout.key)}
+                key={workout.key}
+              >
+                <ListItem
+                  title={workout.title}
+                  description={'' + new Date(workout.date)}
+                  onPress={() => {
+                    loadingStore.enabled = true;
+                    workoutStore
+                      .getOne(workout.key)
+                      .then(() => {
+                        navigation.navigate('Workout', {
+                          workoutIndex: workout.key,
+                        });
+                      })
+                      .finally(() => (loadingStore.enabled = false));
+                  }}
+                />
+              </Swipeout>
+            ))}
+          </ListWrapper>
+        </ScrollView>
       </Layout>
     </SafeAreaView>
   );

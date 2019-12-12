@@ -4,34 +4,25 @@ import { Alert, StyleSheet, View } from 'react-native';
 import Spinner from '../components/Spinner';
 import { firebaseInstance } from '../utilities/firebase';
 import authStore from '../stores/auth-store';
+import loadingStore from '../stores/loading-store';
 
 const error = error => Alert.alert('An error occurred', error);
 
 const AuthLoadingScreen = ({ navigation }) => {
+  loadingStore.enabled = true;
   const unsubscribe = firebaseInstance.auth().onAuthStateChanged(user => {
     if (user && user.uid) {
       authStore.currentUserUid = user.uid;
+      loadingStore.enabled = false;
       navigation.navigate('Home');
     } else {
+      loadingStore.enabled = false;
       navigation.navigate('Login');
     }
     unsubscribe();
   }, error);
 
-  return (
-    <View style={styles.container}>
-      <Spinner />
-    </View>
-  );
+  return null;
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default AuthLoadingScreen;
