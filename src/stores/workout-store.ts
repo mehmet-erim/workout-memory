@@ -19,7 +19,7 @@ class WorkoutsStore {
         key,
         ...this.workouts[key],
       }))
-      .sort((a, b) => +a.key.replace(/workout/i, '') - +b.key.replace(/workout/i, ''));
+      .sort((a, b) => a.date - b.date);
   }
 
   get() {

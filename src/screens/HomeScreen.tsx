@@ -35,18 +35,36 @@ const HomeScreen = ({ navigation }) => {
       <Layout style={{ flex: 1 }}>
         <RoundedButton
           style={{ position: 'absolute', bottom: '10%', right: '10%', width: 200, height: 200 }}
-          onPress={() => navigation.navigate('Workout', { workoutIndex: null })}
+          onPress={() => {
+            workoutStore.selectedWorkout = null;
+            navigation.navigate('Workout', { workoutIndex: null });
+          }}
           size={40}
         />
         <ScrollView style={{ marginBottom: 15 }}>
           <ListWrapper>
             {workoutStore.workoutList.map(workout => (
               <Swipeout
+                autoClose={true}
                 right={[
                   {
                     text: 'Remove',
-                    onPress: () => workoutStore.remove(swipedKey),
+                    onPress: () => {
+                      workoutStore.remove(swipedKey);
+                    },
                     backgroundColor: '#c62828',
+                  },
+                  {
+                    text: 'Duplicate',
+                    onPress: () => {
+                      {
+                        delete workout.key;
+                        workoutStore
+                          .save({ ...workout, date: new Date() })
+                          .then(() => workoutStore.get());
+                      }
+                    },
+                    backgroundColor: '#2196f3',
                   },
                 ]}
                 onOpen={() => setSwipedKey(workout.key)}

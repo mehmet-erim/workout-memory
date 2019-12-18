@@ -10,7 +10,7 @@ export default function({ navigation }) {
 
   return (
     <SafeAreaView>
-      <BottomNavigation selectedIndex={navigation.state.index} onSelect={onSelect}>
+      <BottomNavigation selectedIndex={navigation.state.index === 0 ? 0 : 1} onSelect={onSelect}>
         <BottomNavigationTab title="MOVEMENTS" />
         <BottomNavigationTab title="WORKOUTS" />
       </BottomNavigation>
